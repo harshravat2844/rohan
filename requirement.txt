@@ -1,0 +1,171 @@
+code.txt
+' Here is the code from the Patient.vb class
+module:
+Imports Microsoft.VisualBasic
+Public Class Patient
+ Private account_no_val As String
+ Private lastname_val As String
+ Private firstname_val As String
+ Private middlename_val As String
+ Private dob_val As Date
+ Private bedid_val As Integer
+ Private admitdate_val As Date
+ Private dischargedate_val As Date
+ Public Property AcctNo() As String
+ Get
+ Return account_no_val
+ End Get
+ Set(ByVal value As String)
+ account_no_val = value
+ End Set
+ End Property
+ Public Property LastName() As String
+ Get
+ Return lastname_val
+ End Get
+ Set(ByVal value As String)
+ lastname_val = value
+ End Set
+ End Property
+ Public Property FirstName() As String
+ Get
+Page 1
+code.txt
+ Return firstname_val
+ End Get
+ Set(ByVal value As String)
+ firstname_val = value
+ End Set
+ End Property
+ Public Property MiddleName() As String
+ Get
+ Return Middlename_val
+ End Get
+ Set(ByVal value As String)
+ Middlename_val = value
+ End Set
+ End Property
+ Public Property DOB() As Date
+ Get
+ Return dob_val
+ End Get
+ Set(ByVal value As Date)
+ If value < Now.Date Then
+ dob_val = value
+ End If
+ End Set
+ End Property
+ Public ReadOnly Property BedID() As
+Integer
+ Get
+ Return bedid_val
+ End Get
+ End Property
+ Public ReadOnly Property AdmitDate() As
+Date
+ Get
+ Return admitdate_val
+Page 2
+code.txt
+ End Get
+ End Property
+ Public Property DischargeDate() As Date
+ Get
+ Return dischargedate_val
+ End Get
+ Set(ByVal value As Date)
+ dischargedate_val = value
+ End Set
+ End Property
+ Public Sub Admit()
+ Dim random_instance = New Random
+ bedid_val = Int(random_instance.next)
+ admitdate_val = Today
+ End Sub
+ Public Sub Discharge()
+ If Me.AdmitDate() <= Today Then
+ Me.DischargeDate = Today
+ End If
+ End Sub
+End Class
+' Here is the code from the newpatient.aspx.vb
+webform code file:
+Protected Sub btnAdd_Click(ByVal sender As
+Object, ByVal e As System.EventArgs) Handles
+btnAdd.Click
+ Dim is_it_a_date As DateTime
+ Dim aPatient As New Patient
+ aPatient.AcctNo = txtAcctNo.Text
+ aPatient.FirstName = txtFirst.Text
+ aPatient.MiddleName = txtMiddle.Text
+Page 3
+code.txt
+ aPatient.LastName = txtLast.Text
+ Try
+ is_it_a_date =
+Convert.ToDateTime(txtDOB.Text)
+ Catch ex As Exception
+ lblDateError.Text = "Your entry
+does not appear to be a valid date."
+ lblDateError.Visible = True
+ txtDOB.Text = Today.ToString
+ End Try
+ If is_it_a_date > Today Then
+ lblDateError.Text = " A date of
+birth should be before today."
+ lblDateError.Visible = True
+ txtDOB.Text = Today.ToString
+ End If
+ aPatient.DOB =
+Convert.ToDateTime(txtDOB.Text)
+ aPatient.Admit()
+ lblShowAcctNo.Text = "A new patient is
+being created with an account number of " &
+aPatient.AcctNo _
+ & ", whose name is " &
+aPatient.FirstName & " " & aPatient.MiddleName
+& " " & aPatient.LastName _
+ & ", and who was born " & aPatient.DOB
+& ". The patient is being admitted today, " &
+aPatient.AdmitDate _
+ & " into bed #" & aPatient.BedID & "."
+ Session("Patient") = aPatient
+ End Sub
+ Protected Sub Page_Load(ByVal sender As
+Object, ByVal e As System.EventArgs) Handles
+Page 4
+code.txt
+Me.Load
+ If Not IsPostBack Then
+ txtAcctNo.Text = "3489052332"
+ txtFirst.Text = "Porky"
+ txtMiddle.Text = "Pernicious"
+ txtLast.Text = "Pigg"
+ txtDOB.Text = "11/08/1925"
+ End If
+ End Sub
+' Here is the code from the
+dischargepatient.aspx.vb webform code file:
+ Protected Sub btnDischarge_Click(ByVal
+sender As Object, ByVal e As System.EventArgs)
+Handles btnDischarge.Click
+ Dim aPatient As New Patient
+ aPatient = Session("Patient")
+ aPatient.Discharge()
+ lblShow.Text = "The current patient "
+& aPatient.FirstName & " " &
+aPatient.MiddleName & " " & aPatient.LastName
+_
+ & " was born " & aPatient.DOB & ".
+This patient, with an account number of " &
+aPatient.AcctNo _
+ & "was admitted on " &
+aPatient.AdmitDate & " into bed #" &
+aPatient.BedID & ". The patient record will
+now show a " _
+ & "discharge date of " &
+aPatient.DischargeDate & "."
+Page 5
+code.txt
+ End Sub
+Page 6
